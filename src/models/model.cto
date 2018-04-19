@@ -1,0 +1,81 @@
+
+namespace org.sample
+
+/**
+ * The types of animals that could be moved
+ */
+enum AnimalType {
+  o SHEEP
+  o CATTLE
+  o PIG
+}
+
+/**
+ * The movement status for an animal
+ */
+enum MovementStatus {
+  o IN_FIELD
+  o IN_TRANSIT
+}
+
+/**
+ * The production type associated with an animal
+ */
+enum ProductionType {
+  o MEAT
+  o WOOL
+  o DAIRY
+  o BREEDING
+  o OTHER
+}
+
+/**
+ * A Farmer participant
+ */
+participant Farmer identified by email {
+  o String email
+  o String firstName
+  o String lastName
+  o Double balance
+}
+
+/**
+ * An Animal asset
+ */
+asset Animal identified by animalId {
+    o String animalId
+    o String name
+    o String colour
+    o AnimalType species
+    o MovementStatus movementStatus
+    o ProductionType productionType
+    o Double proposedPrice optional
+    --> Farmer owner
+}
+
+/**
+ * A transaction type for an animal leaving a farm
+ */
+transaction ProposeTrade {
+  o Double price
+  --> Animal animal
+}
+
+/**
+ * A transaction type for an animal arriving to the farmer
+ */
+transaction AcceptTrade {
+  --> Animal animal
+}
+
+/**
+ * A transaction type for an animal returning to its owner
+ */
+transaction CancelTrade {
+  --> Animal animal
+}
+/**
+ * Set initial data to the model
+ */
+transaction SetupDemo  {
+}

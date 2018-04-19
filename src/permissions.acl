@@ -1,0 +1,76 @@
+/**
+ * Sample access control list.
+ */
+
+rule SystemACL {
+  description:  "System ACL to permit all access"
+  participant: "org.hyperledger.composer.system.Participant"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule LedgerAccess {
+  description:  "Access to ledger"
+  participant: "org.sample.**"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule FarmerAccessToAnimals {
+  description: "Farmer access"
+  participant(p): "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource(r): "org.sample.Animal"
+  condition: (p.getIdentifier() == r.owner.getIdentifier() || r.movementStatus == 'IN_TRANSIT')
+  action: ALLOW
+}
+
+rule FarmerAccessToFarmers {
+  description: "Let farmers see each other"
+  participant: "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource: "org.sample.Farmer"
+  action: ALLOW
+}
+
+rule FarmerSubmitProposeTrade {
+  description: "Let farmers depart animals"
+  participant: "org.sample.Farmer"
+  operation: CREATE, READ
+  resource: "org.sample.ProposeTrade"
+  action: ALLOW
+}
+
+rule FarmerSubmitAcceptTrade {
+  description: "Let farmers accept animals"
+  participant: "org.sample.Farmer"
+  operation: CREATE, READ
+  resource: "org.sample.AcceptTrade"
+  action: ALLOW
+}
+
+rule FarmerSubmitCancelTrade {
+  description: "Let farmers reject animals"
+  participant: "org.sample.Farmer"
+  operation: CREATE, READ
+  resource: "org.sample.CancelTrade"
+  action: ALLOW
+}
