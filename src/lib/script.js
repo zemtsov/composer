@@ -16,6 +16,10 @@ async function onProposeTrade(tx) {
     throw new Error('This is not your animal!')
   }
 
+  // Check the price proposed
+  if (tx.price <= 0) {
+    throw new Error('Invalid price')
+  }
   // change the movement status of the animal
   tx.animal.movementStatus = 'IN_TRANSIT';
 
