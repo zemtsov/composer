@@ -45,6 +45,12 @@ async function onAcceptTrade(tx) {
   const fr = await getParticipantRegistry('org.sample.Farmer');
   // find the proper farmer in the registry
   const farmer = await fr.get(getCurrentParticipant().getIdentifier());
+  // find the animal's owner
+  const owner = await fr.get(tx.animal.owner.getIdentifier());
+
+  if (farmer.getFullyQualifiedIdentifier() == owner.getFullyQualifiedIdentifier()) {
+    throw new Error("This is your animal")
+  }
 
   if (farmer.balance < tx.animal.proposedPrice) {
     throw new Error("Not enough money on your balance")
@@ -52,6 +58,8 @@ async function onAcceptTrade(tx) {
 
   // reduce the farmer's balance
   farmer.balance -= tx.animal.proposedPrice;
+  // add money to owner's balance
+  owner.balance += tx.animal.proposedPrice;
   // change the animal's status
   tx.animal.movementStatus = 'IN_FIELD';
   // change the animal's owner
@@ -61,6 +69,8 @@ async function onAcceptTrade(tx) {
 
   // update farmer in the registry
   await fr.update(farmer);
+  // update old owner in the registry
+  await fr.update(owner);
 
   // get animals registry
   const ar = await getAssetRegistry('org.sample.Animal');
@@ -175,42 +185,42 @@ async function setupDemo(setupDemo) {
   animals[3].colour = 'Blue';
   animals[3].movementStatus = 'IN_FIELD';
   animals[3].productionType = 'BREEDING';
-  animals[3].owner = factory.newRelationship(NS, 'Farmer', farmers[3].email);
+  animals[3].owner = factory.newRelationship(NS, 'Farmer', farmers[0].email);
 
   animals[4].species = 'SHEEP';
   animals[4].name = 'Polo';
   animals[4].colour = 'Green';
   animals[4].movementStatus = 'IN_FIELD';
   animals[4].productionType = 'MEAT';
-  animals[4].owner = factory.newRelationship(NS, 'Farmer', farmers[4].email);
+  animals[4].owner = factory.newRelationship(NS, 'Farmer', farmers[1].email);
 
   animals[5].species = 'SHEEP';
   animals[5].name = 'Priscilla'
   animals[5].colour = 'Red';
   animals[5].movementStatus = 'IN_FIELD';
   animals[5].productionType = 'WOOL';
-  animals[5].owner = factory.newRelationship(NS, 'Farmer', farmers[0].email);
+  animals[5].owner = factory.newRelationship(NS, 'Farmer', farmers[2].email);
 
   animals[6].species = 'CATTLE';
   animals[6].name = 'Jack';
   animals[6].colour = 'White';
   animals[6].movementStatus = 'IN_FIELD';
   animals[6].productionType = 'BREEDING';
-  animals[6].owner = factory.newRelationship(NS, 'Farmer', farmers[1].email);
+  animals[6].owner = factory.newRelationship(NS, 'Farmer', farmers[0].email);
 
   animals[7].species = 'PIG';
   animals[7].name = 'Coribda';
   animals[7].colour = 'Blue';
   animals[7].movementStatus = 'IN_FIELD';
   animals[7].productionType = 'DAIRY';
-  animals[7].owner = factory.newRelationship(NS, 'Farmer', farmers[2].email);
+  animals[7].owner = factory.newRelationship(NS, 'Farmer', farmers[1].email);
 
   animals[8].species = 'SHEEP';
   animals[8].name = 'Mickey';
   animals[8].colour = 'Green';
   animals[8].movementStatus = 'IN_FIELD';
   animals[8].productionType = 'WOOL';
-  animals[8].owner = factory.newRelationship(NS, 'Farmer', farmers[3].email);
+  animals[8].owner = factory.newRelationship(NS, 'Farmer', farmers[2].email);
 
   // write animals to the registry
   await animalRegistry.addAll(animals);
