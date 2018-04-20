@@ -1,0 +1,13 @@
+query AllSheeps {
+  description: "Select sheeps from animals"
+  statement: 
+    SELECT org.sample.Animal
+      WHERE (species == 'SHEEP')
+}
+
+query AnimalsByType {
+  description: "Select all animals of given type"
+  statement:
+    SELECT org.sample.Animal
+      WHERE (species == _$type)
+}
