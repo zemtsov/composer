@@ -37,17 +37,18 @@ rule LedgerAccess {
 rule FarmerAccessToAnimals {
   description: "Farmer access"
   participant(p): "org.sample.Farmer"
-  operation: READ, UPDATE
+  operation: READ
   resource(r): "org.sample.Animal"
   condition: (p.getIdentifier() == r.owner.getIdentifier() || r.movementStatus == 'IN_TRANSIT')
   action: ALLOW
 }
 
-rule FarmerAccessToFarmers {
-  description: "Let farmers see each other"
-  participant: "org.sample.Farmer"
-  operation: READ, UPDATE
-  resource: "org.sample.Farmer"
+rule FarmerAccessToHimsemf {
+  description: "Farmer access to himself"
+  participant(p): "org.sample.Farmer"
+  operation: READ
+  resource(r): "org.sample.Farmer"
+  condition: (p.getIdentifier() == r.getIdentifier())
   action: ALLOW
 }
 
@@ -59,6 +60,16 @@ rule FarmerSubmitProposeTrade {
   action: ALLOW
 }
 
+rule UpdateAnimalsWithTransactionProposeTrade {
+  description: "Update animals with transactions"
+  participant(p): "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource(r): "org.sample.Animal"
+  transaction(tx): "org.sample.ProposeTrade"
+  condition: (p.getIdentifier() == r.owner.getIdentifier() && r.movementStatus == 'IN_FIELD')
+  action: ALLOW
+}
+
 rule FarmerSubmitAcceptTrade {
   description: "Let farmers accept animals"
   participant: "org.sample.Farmer"
@@ -67,10 +78,39 @@ rule FarmerSubmitAcceptTrade {
   action: ALLOW
 }
 
+rule UpdateAnimalsWithTransactionAcceptTrade {
+  description: "Allow changing owner when accepting the trade"
+  participant(p): "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource(r): "org.sample.Animal"
+  transaction(tx): "org.sample.AcceptTrade"
+  condition: (p.getIdentifier() != r.owner.getIdentifier() && r.movementStatus == 'IN_TRANSIT')
+  action: ALLOW
+}
+
+rule UpdateFarmersWithTransactionAcceptTrade {
+  description: "Allow to change balance when accepting the trade"
+  participant: "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource: "org.sample.Farmer"
+  transaction: "org.sample.AcceptTrade"
+  action: ALLOW
+}
+
 rule FarmerSubmitCancelTrade {
-  description: "Let farmers reject animals"
+  description: "Allow cancelling the trade"
   participant: "org.sample.Farmer"
   operation: CREATE, READ
   resource: "org.sample.CancelTrade"
+  action: ALLOW
+}
+
+rule UpdateAnimalsWithTransactionCancelTrade {
+  description: "Allow to change animal's status when cancelling the trade"
+  participant(p): "org.sample.Farmer"
+  operation: READ, UPDATE
+  resource(r): "org.sample.Animal"
+  transaction(tx): "org.sample.CancelTrade"
+  condition: (r.owner.getIdentifier() == p.getIdentifier() && r.movementStatus == 'IN_TRANSIT')
   action: ALLOW
 }
