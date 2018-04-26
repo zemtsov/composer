@@ -5,19 +5,12 @@
  */
 async function onProposeTrade(tx) {
 
-  // check if the animal has correct status
-  if (tx.animal.movementStatus !== 'IN_FIELD') {
-    throw new Error('The animal is already on sale');
-  }
-
-  // check if the participant is the animal's owner
-  if (tx.animal.owner.getFullyQualifiedIdentifier() !==
-    getCurrentParticipant().getFullyQualifiedIdentifier()) {
-    throw new Error('This is not your animal!')
-  }
-
   // change the movement status of the animal
   tx.animal.movementStatus = 'IN_TRANSIT';
+
+  if (tx.price <= 0) {
+    throw new Error("Invalid price");
+  }
 
   // set the proposed price
   tx.animal.proposedPrice = tx.price;
@@ -36,11 +29,6 @@ async function onProposeTrade(tx) {
  */
 async function onAcceptTrade(tx) {
 
-  // check if the animal has correct status
-  if (tx.animal.movementStatus !== 'IN_TRANSIT') {
-    throw new Error('The animal is not on sale');
-  }
-
   // get farmers registry
   const fr = await getParticipantRegistry('org.sample.Farmer');
   // find the proper farmer in the registry
@@ -48,12 +36,8 @@ async function onAcceptTrade(tx) {
   // find the animal's owner
   const owner = await fr.get(tx.animal.owner.getIdentifier());
 
-  if (farmer.getFullyQualifiedIdentifier() == owner.getFullyQualifiedIdentifier()) {
-    throw new Error("This is your animal")
-  }
-
   if (farmer.balance < tx.animal.proposedPrice) {
-    throw new Error("Not enough money on your balance")
+    throw new Error("Not enough money on your balance");
   }
 
   // reduce the farmer's balance
@@ -85,17 +69,6 @@ async function onAcceptTrade(tx) {
  * @transaction
  */
 async function onCancelTrade(tx) {
-
-  // check if the animal has correct status
-  if (tx.animal.movementStatus !== 'IN_TRANSIT') {
-    throw new Error('The animal is not on sale');
-  }
-
-  // check if the participant is the animal's owner
-  if (tx.animal.owner.getFullyQualifiedIdentifier() !==
-    getCurrentParticipant().getFullyQualifiedIdentifier()) {
-    throw new Error('This is not your animal!')
-  }
 
   // change the animal's status
   tx.animal.movementStatus = 'IN_FIELD';
