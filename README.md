@@ -4,7 +4,7 @@ Hyperledger Composer Online Playground:
 https://composer-playground.mybluemix.net
 
 Hyperledger Composer API: 
-https://hyperledger.github.io/composer/unstable/jsdoc/index.html
+https://hyperledger.github.io/composer/latest/api/api-doc-index
 
 Hyperledger Composer Tutorials:
 https://hyperledger.github.io/composer/latest/tutorials/developer-tutorial
