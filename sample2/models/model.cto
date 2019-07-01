@@ -1,0 +1,37 @@
+namespace test.io
+
+participant Company identified by Name {
+  o String Name
+}
+
+participant User identified by email {
+  o String email
+  o String name
+}
+
+enum OrderStatus {
+  o NEW
+  o EXECUTED
+  o DECLINED
+}
+
+
+asset Order identified by id {
+  o String id
+  o OrderStatus status
+  --> Company company
+  --> User user
+}
+
+transaction MakeOrder {
+  o String id
+  --> Company company
+}
+
+transaction ExecuteOrder {
+  o String orderId
+}
+
+transaction DeclineName {
+  o String orderId
+}

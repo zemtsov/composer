@@ -1,0 +1,84 @@
+rule NetworkAdminUser {
+    description: "Grant business network administrators full access to user resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "**"
+    action: ALLOW
+}
+
+rule NetworkAdminSystem {
+    description: "Grant business network administrators full access to system resources"
+    participant: "org.hyperledger.composer.system.NetworkAdmin"
+    operation: ALL
+    resource: "org.hyperledger.composer.system.**"
+    action: ALLOW
+}
+
+rule LedgerAccess {
+  description:  "Access to ledger"
+  participant: "test.io.**"
+  operation: ALL
+  resource: "org.hyperledger.composer.system.**"
+  action: ALLOW
+}
+
+rule CreateOrder {
+  description: "Create order"
+  participant: "test.io.User"
+  operation: CREATE, READ
+  resource: "test.io.Order"
+  transaction: "test.io.MakeOrder"
+  action: ALLOW
+}
+
+rule CreateMakeOrderTx {
+  description: "MakeOrder Tx"
+  participant: "test.io.User"
+  operation: CREATE, READ
+  resource: "test.io.MakeOrder"
+  action: ALLOW
+}
+
+rule UserSeeOrders {
+  description: "User see orders"
+  participant(p): "test.io.User"
+  operation: READ
+  resource(r): "test.io.Order"
+  condition: (p.getIdentifier() == r.user.getIdentifier())
+  action: ALLOW
+}
+
+rule CompanyReadOrders {
+  description: "Company read orders"
+  participant(p): "test.io.Company"
+  operation: ALL
+  resource(r): "test.io.Order"
+  condition: (p.getIdentifier() == r.company.getIdentifier())
+  action: ALLOW
+}
+
+rule ExecuteOrder {
+  description: "Execute order"
+  participant(p): "test.io.Company"
+  operation: UPDATE, READ
+  resource(r): "test.io.Order"
+  transaction: "test.io.ExecuteOrder"
+  condition: (p.getIdentifier == r.company.getIdentifier())
+  action: ALLOW
+}
+
+rule CreateExecuteOrderTx {
+  description: "ExecuteOrder Tx"
+  participant: "test.io.Company"
+  operation: CREATE, READ
+  resource: "test.io.ExecuteOrder"
+  action: ALLOW
+}
+
+rule CompanyAccessCompany {
+  description: "Company access Company"
+  participant: "test.io.Company"
+  operation: READ
+  resource: "test.io.Company"
+  action: ALLOW
+}
